@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowRight, Clock, Users, Minus, Plus, Lock } from "lucide-react";
 import { useState } from "react";
-import { getRecipe } from "@/data/recipes";
+import { getRecipe, type Recipe } from "@/data/recipes";
 
 export const Route = createFileRoute("/recipe/$id")({
   loader: ({ params }) => {
@@ -30,7 +30,7 @@ function formatAmount(n: number) {
 }
 
 function RecipePage() {
-  const { recipe } = Route.useLoaderData() as { recipe: ReturnType<typeof getRecipe> & object };
+  const { recipe } = Route.useLoaderData() as { recipe: Recipe };
   const [servings, setServings] = useState<number>(recipe.baseServings);
   const ratio = servings / recipe.baseServings;
 
