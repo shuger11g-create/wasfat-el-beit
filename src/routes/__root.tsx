@@ -72,11 +72,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "مطبخي — وصفات وأسرار الطبخ" },
+      { name: "description", content: "تطبيق وصفات عربي بتصميم أنيق: مشروبات، حلى، أكلات رئيسية، معجنات، وأسرار صناعية وحاسبة كميات." },
+      { name: "author", content: "مطبخي" },
+      { property: "og:title", content: "مطبخي — وصفات وأسرار الطبخ" },
+      { property: "og:description", content: "وصفات عربية بتصميم أنيق مع حاسبة كميات وأسرار المطاعم." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
@@ -96,7 +96,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="ar" dir="rtl">
       <head>
         <HeadContent />
       </head>
