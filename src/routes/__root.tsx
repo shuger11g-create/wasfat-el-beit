@@ -76,10 +76,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "تطبيق وصفات عربي بتصميم أنيق: مشروبات، حلى، أكلات رئيسية، معجنات، وأسرار صناعية وحاسبة كميات." },
       { name: "author", content: "مطبخي" },
       { property: "og:title", content: "مطبخي — وصفات وأسرار الطبخ" },
-      { property: "og:description", content: "وصفات عربية بتصميم أنيق مع حاسبة كميات وأسرار المطاعم." },
+      { property: "og:description", content: "تطبيق وصفات عربي بتصميم أنيق: مشروبات، حلى، أكلات رئيسية، معجنات، وأسرار صناعية وحاسبة كميات." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "مطبخي — وصفات وأسرار الطبخ" },
+      { name: "twitter:description", content: "تطبيق وصفات عربي بتصميم أنيق: مشروبات، حلى، أكلات رئيسية، معجنات، وأسرار صناعية وحاسبة كميات." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/4f8ec49b-b259-416f-a9c0-5e3e681cfb25/id-preview-a6b65956--2b13be97-9cd2-4453-920b-680eb6930657.lovable.app-1780044067146.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/4f8ec49b-b259-416f-a9c0-5e3e681cfb25/id-preview-a6b65956--2b13be97-9cd2-4453-920b-680eb6930657.lovable.app-1780044067146.png" },
     ],
     links: [
       {
