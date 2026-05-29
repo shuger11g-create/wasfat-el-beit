@@ -32,7 +32,8 @@ export interface Recipe {
   name: string;
   category: CategoryId;
   image: string;
-  time: string;
+  /** Total minutes; rendered via formatTime() */
+  timeMinutes: number;
   baseServings: number;
   description: string;
   ingredients: Ingredient[];
@@ -40,13 +41,23 @@ export interface Recipe {
   secret?: boolean;
 }
 
-export const recipes: Recipe[] = [
+const categoryImage: Record<CategoryId, string> = {
+  drinks: colaImg,
+  desserts: vanillaImg,
+  mains: burgerImg,
+  pastries: manakishImg,
+  secret: colaImg,
+};
+
+// ============ Featured / hand-crafted recipes ============
+
+const featured: Recipe[] = [
   {
     id: "vanilla-ice-cream",
     name: "آيس كريم الفانيليا",
     category: "desserts",
     image: vanillaImg,
-    time: "20 دقيقة + تجميد",
+    timeMinutes: 20,
     baseServings: 4,
     description: "آيس كريم فانيليا كريمي بمذاق المحلات، بمكونات بسيطة من المطبخ.",
     ingredients: [
@@ -69,7 +80,7 @@ export const recipes: Recipe[] = [
     name: "كولا منزلية طبيعية",
     category: "secret",
     image: colaImg,
-    time: "30 دقيقة",
+    timeMinutes: 30,
     baseServings: 4,
     secret: true,
     description: "سر تحضير مشروب الكولا بمكونات طبيعية في البيت — بدون مواد حافظة.",
@@ -90,11 +101,40 @@ export const recipes: Recipe[] = [
     ],
   },
   {
+    id: "homemade-pepsi",
+    name: "البيبسي المنزلي ونكهات السر الصناعي",
+    category: "secret",
+    image: colaImg,
+    timeMinutes: 35,
+    baseServings: 4,
+    secret: true,
+    description: "نسخة البيبسي المنزلية بنكهات السر الصناعي — تركيبة كراميل التوابل التي تعطي اللون والمذاق الشهير.",
+    ingredients: [
+      { name: "ماء", amount: 2, unit: "كوب" },
+      { name: "سكر أبيض", amount: 1, unit: "كوب" },
+      { name: "سكر بني للكراميل", amount: 0.5, unit: "كوب" },
+      { name: "عصير ليمون", amount: 2, unit: "ملعقة كبيرة" },
+      { name: "خلاصة فانيليا", amount: 0.5, unit: "ملعقة صغيرة" },
+      { name: "قشر ليمون مبشور", amount: 1, unit: "ملعقة صغيرة" },
+      { name: "جوزة الطيب", amount: 0.25, unit: "ملعقة صغيرة" },
+      { name: "قرفة بودرة", amount: 0.25, unit: "ملعقة صغيرة" },
+      { name: "ماء غازي بارد", amount: 4, unit: "كوب" },
+    ],
+    steps: [
+      "اصنعي كراميل: ذوّبي السكر البني على نار هادئة حتى يصبح بلون عنبري داكن.",
+      "أضيفي الماء بحذر مع التحريك حتى يذوب الكراميل تماماً.",
+      "أضيفي السكر الأبيض، قشر الليمون، القرفة وجوزة الطيب واتركيه يغلي 5 دقائق.",
+      "ارفعيه عن النار، أضيفي عصير الليمون والفانيليا، واتركيه يبرد تماماً.",
+      "صفي الشراب جيداً واحفظيه في زجاجة بالثلاجة.",
+      "اخلطي ملعقتين كبيرتين من الشراب مع كوب ماء غازي مثلج وقدميه.",
+    ],
+  },
+  {
     id: "secret-burger-sauce",
     name: "صوص البرجر السري",
     category: "secret",
     image: burgerImg,
-    time: "10 دقائق",
+    timeMinutes: 10,
     baseServings: 4,
     secret: true,
     description: "صوص البرجر الشهير الذي تستخدمه المطاعم العالمية — مكوناته من مطبخك.",
@@ -117,7 +157,7 @@ export const recipes: Recipe[] = [
     name: "كنافة بالقشطة",
     category: "desserts",
     image: kunafaImg,
-    time: "45 دقيقة",
+    timeMinutes: 45,
     baseServings: 6,
     description: "كنافة ذهبية مقرمشة محشوة بالقشطة ومغموسة بالقطر.",
     ingredients: [
@@ -140,7 +180,7 @@ export const recipes: Recipe[] = [
     name: "مناقيش الجبنة",
     category: "pastries",
     image: manakishImg,
-    time: "35 دقيقة",
+    timeMinutes: 35,
     baseServings: 4,
     description: "مناقيش طرية بجبنة عكاوي ذائبة، فطور لذيذ في دقائق.",
     ingredients: [
@@ -162,7 +202,7 @@ export const recipes: Recipe[] = [
     name: "أصابع الموزاريلا المقرمشة",
     category: "mains",
     image: snacksImg,
-    time: "25 دقيقة",
+    timeMinutes: 25,
     baseServings: 4,
     description: "أصابع موزاريلا ذهبية مقرمشة من الخارج، ذائبة من الداخل.",
     ingredients: [
@@ -181,5 +221,281 @@ export const recipes: Recipe[] = [
     ],
   },
 ];
+
+// ============ Generated catalog (100 per category) ============
+
+interface NameSet {
+  bases: string[];
+  flavors: string[];
+}
+
+const nameSets: Record<CategoryId, NameSet> = {
+  drinks: {
+    bases: [
+      "عصير",
+      "موكتيل",
+      "سموذي",
+      "ميلك شيك",
+      "مشروب بارد",
+      "شاي مثلج",
+      "ليموناضة",
+      "كوكتيل",
+      "مشروب صحي",
+      "مشروب رمضاني",
+    ],
+    flavors: [
+      "الفراولة",
+      "المانجو",
+      "الأناناس",
+      "البطيخ",
+      "التوت",
+      "البرتقال",
+      "الليمون والنعناع",
+      "الخوخ",
+      "الرمان",
+      "الكيوي",
+    ],
+  },
+  desserts: {
+    bases: [
+      "كيكة",
+      "تشيز كيك",
+      "بانكيك",
+      "براونيز",
+      "كوكيز",
+      "موس",
+      "بودنغ",
+      "تارت",
+      "آيس كريم",
+      "ترايفل",
+    ],
+    flavors: [
+      "الشوكولاتة",
+      "الفانيليا",
+      "اللوتس",
+      "الفراولة",
+      "الكراميل المملح",
+      "النوتيلا",
+      "الموز",
+      "الفستق",
+      "الزبدة الفول السوداني",
+      "التوت الأزرق",
+    ],
+  },
+  mains: {
+    bases: [
+      "برجر",
+      "باستا",
+      "بيتزا",
+      "دجاج مشوي",
+      "أرز",
+      "ستيك",
+      "شاورما",
+      "كبسة",
+      "لازانيا",
+      "حساء",
+    ],
+    flavors: [
+      "بالجبن الذائب",
+      "بصلصة الفطر",
+      "بالأعشاب الإيطالية",
+      "بالليمون والثوم",
+      "بالخضار المشوية",
+      "بصلصة الباربكيو",
+      "بالكريمة",
+      "بالطماطم والريحان",
+      "الحار",
+      "بنكهة التندوري",
+    ],
+  },
+  pastries: {
+    bases: [
+      "مناقيش",
+      "فطائر",
+      "كرواسون",
+      "خبز",
+      "صامولي",
+      "بيتزا صغيرة",
+      "سمبوسة",
+      "بقلاوة",
+      "سينابون",
+      "دونات",
+    ],
+    flavors: [
+      "بالجبنة",
+      "بالزعتر",
+      "باللحمة",
+      "بالسبانخ",
+      "بالشوكولاتة",
+      "بالقرفة",
+      "بالعسل والجوز",
+      "بالقشطة",
+      "بالتمر",
+      "بالسمسم",
+    ],
+  },
+  secret: {
+    bases: [
+      "صوص سر المطعم",
+      "تتبيلة سرية",
+      "خلطة بهارات",
+      "ماريناد",
+      "صوص باربكيو",
+      "صوص رانش",
+      "نكهة سرية",
+      "خلطة ديب",
+      "صوص حار",
+      "صوص قيصر",
+    ],
+    flavors: [
+      "للبرجر",
+      "للدجاج المقلي",
+      "للستيك",
+      "للأجنحة",
+      "للسلطات",
+      "للشاورما",
+      "للبيتزا",
+      "للباستا",
+      "للسمك",
+      "للمشاوي",
+    ],
+  },
+};
+
+const ingredientPools: Record<CategoryId, Ingredient[]> = {
+  drinks: [
+    { name: "فاكهة طازجة مقطعة", amount: 2, unit: "كوب" },
+    { name: "ماء بارد", amount: 1, unit: "كوب" },
+    { name: "سكر", amount: 3, unit: "ملعقة كبيرة" },
+    { name: "ثلج مجروش", amount: 1, unit: "كوب" },
+    { name: "نعناع طازج", amount: 5, unit: "ورقات" },
+    { name: "عصير ليمون", amount: 1, unit: "ملعقة كبيرة" },
+  ],
+  desserts: [
+    { name: "دقيق", amount: 1.5, unit: "كوب" },
+    { name: "سكر", amount: 1, unit: "كوب" },
+    { name: "زبدة", amount: 0.5, unit: "كوب" },
+    { name: "بيض", amount: 2, unit: "حبة" },
+    { name: "حليب", amount: 0.75, unit: "كوب" },
+    { name: "فانيليا", amount: 1, unit: "ملعقة صغيرة" },
+    { name: "بيكنج باودر", amount: 1.5, unit: "ملعقة صغيرة" },
+  ],
+  mains: [
+    { name: "بروتين رئيسي (دجاج/لحم)", amount: 500, unit: "غرام" },
+    { name: "بصل مفروم", amount: 1, unit: "حبة" },
+    { name: "ثوم مهروس", amount: 3, unit: "فصوص" },
+    { name: "زيت زيتون", amount: 3, unit: "ملعقة كبيرة" },
+    { name: "ملح وفلفل", amount: 1, unit: "حسب الذوق" },
+    { name: "بهارات مشكلة", amount: 1.5, unit: "ملعقة صغيرة" },
+    { name: "صلصة طماطم", amount: 0.5, unit: "كوب" },
+  ],
+  pastries: [
+    { name: "عجينة جاهزة", amount: 500, unit: "غرام" },
+    { name: "حشوة مختارة", amount: 1.5, unit: "كوب" },
+    { name: "زيت زيتون", amount: 2, unit: "ملعقة كبيرة" },
+    { name: "بيضة للدهن", amount: 1, unit: "حبة" },
+    { name: "سمسم", amount: 1, unit: "ملعقة كبيرة" },
+    { name: "زبدة مذابة", amount: 0.25, unit: "كوب" },
+  ],
+  secret: [
+    { name: "مايونيز", amount: 0.5, unit: "كوب" },
+    { name: "كاتشب", amount: 2, unit: "ملعقة كبيرة" },
+    { name: "خل تفاح", amount: 1, unit: "ملعقة كبيرة" },
+    { name: "ثوم بودرة", amount: 1, unit: "ملعقة صغيرة" },
+    { name: "بابريكا مدخنة", amount: 1, unit: "ملعقة صغيرة" },
+    { name: "صلصة حارة", amount: 1, unit: "ملعقة صغيرة" },
+    { name: "سكر بني", amount: 1, unit: "ملعقة صغيرة" },
+  ],
+};
+
+const stepsByCategory: Record<CategoryId, string[]> = {
+  drinks: [
+    "اغسلي الفواكه وقطعيها قطعاً صغيرة.",
+    "ضعي جميع المكونات في الخلاط الكهربائي.",
+    "اخلطيها على سرعة عالية حتى تنعم تماماً.",
+    "صفي المشروب إذا رغبتِ بقوام ناعم جداً.",
+    "اسكبيه في كؤوس مزينة بالنعناع والثلج.",
+  ],
+  desserts: [
+    "سخّني الفرن على 180°م وحضّري القالب بالزبدة.",
+    "اخفقي الزبدة والسكر حتى يصبح المزيج كريمياً.",
+    "أضيفي البيض والفانيليا واخلطي جيداً.",
+    "أضيفي المكونات الجافة تدريجياً وقلّبي بلطف.",
+    "اسكبي الخليط في القالب واخبزيه حتى ينضج.",
+    "اتركيه يبرد قبل التقديم والتزيين.",
+  ],
+  mains: [
+    "تبّلي البروتين بالبهارات والملح والفلفل.",
+    "سخّني الزيت وحمّري البصل والثوم.",
+    "أضيفي البروتين وحمّريه من جميع الجهات.",
+    "أضيفي صلصة الطماطم والبهارات وقلّبي.",
+    "غطّيها واتركيها على نار هادئة حتى تنضج.",
+    "قدّميها ساخنة مع المرافقات المفضلة.",
+  ],
+  pastries: [
+    "افردي العجينة على سطح مرشوش بالدقيق.",
+    "قطّعيها بالشكل المطلوب وضعيها في صينية.",
+    "وزّعي الحشوة بالتساوي مع ترك حواف صغيرة.",
+    "ادهنيها بالبيض ورشّي السمسم.",
+    "اخبزيها على 200°م حتى تذهب وتتحمر.",
+    "قدميها دافئة مع الشاي أو اللبن.",
+  ],
+  secret: [
+    "اخلطي جميع المكونات في وعاء عميق.",
+    "حرّكي جيداً حتى تتجانس النكهات.",
+    "غطّي الصوص واتركيه في الثلاجة 30 دقيقة.",
+    "تذوّقي وعدّلي الملح والحرارة حسب الرغبة.",
+    "احفظيه في برطمان محكم لمدة أسبوع.",
+  ],
+};
+
+function generateForCategory(cat: CategoryId, count: number): Recipe[] {
+  const { bases, flavors } = nameSets[cat];
+  const pool = ingredientPools[cat];
+  const steps = stepsByCategory[cat];
+  const img = categoryImage[cat];
+  const out: Recipe[] = [];
+  let n = 0;
+  for (const base of bases) {
+    for (const flavor of flavors) {
+      if (n >= count) break;
+      n++;
+      const name = `${base} ${flavor}`;
+      // Vary time: 15..150 min
+      const timeMinutes = 15 + ((n * 7) % 136);
+      // Vary servings: 2,4,6,8
+      const baseServings = [2, 4, 6, 8][n % 4];
+      // Slight amount variation per recipe
+      const variation = 0.75 + ((n % 5) * 0.1);
+      const ingredients: Ingredient[] = pool.map((ing) => ({
+        ...ing,
+        amount: Math.round(ing.amount * variation * 100) / 100,
+      }));
+      // Add a flavor-specific accent ingredient
+      ingredients.push({ name: `نكهة ${flavor.replace(/^ال/, "")}`, amount: 1, unit: "ملعقة كبيرة" });
+
+      out.push({
+        id: `${cat}-${n}`,
+        name,
+        category: cat,
+        image: img,
+        timeMinutes,
+        baseServings,
+        description: `${name} — وصفة شهية وسهلة بمكونات متوفرة في كل بيت.`,
+        ingredients,
+        steps,
+        secret: cat === "secret",
+      });
+    }
+    if (n >= count) break;
+  }
+  return out;
+}
+
+const generated: Recipe[] = (
+  ["drinks", "desserts", "mains", "pastries", "secret"] as CategoryId[]
+).flatMap((c) => generateForCategory(c, 100));
+
+export const recipes: Recipe[] = [...featured, ...generated];
 
 export const getRecipe = (id: string) => recipes.find((r) => r.id === id);

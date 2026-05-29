@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Search, Clock, Sparkles, Lock } from "lucide-react";
 import { useMemo, useState } from "react";
 import { categories, recipes, type CategoryId } from "@/data/recipes";
+import { formatTime } from "@/lib/format";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -108,7 +109,7 @@ function HomePage() {
                   <h3 className="font-bold text-foreground text-sm leading-tight mb-1">{r.name}</h3>
                   <div className="flex items-center gap-1 text-xs text-muted-foreground">
                     <Clock className="h-3.5 w-3.5" />
-                    <span>{r.time}</span>
+                    <span>{formatTime(r.timeMinutes)}</span>
                   </div>
                 </div>
               </Link>
@@ -144,7 +145,7 @@ function HomePage() {
                   <h3 className="font-bold text-sm leading-tight mb-1">{r.name}</h3>
                   <div className="flex items-center gap-1 text-xs opacity-75">
                     <Clock className="h-3 w-3" />
-                    <span>{r.time}</span>
+                    <span>{formatTime(r.timeMinutes)}</span>
                   </div>
                 </div>
               </Link>
