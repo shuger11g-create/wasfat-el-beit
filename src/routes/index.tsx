@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Search, Clock, Sparkles, Lock } from "lucide-react";
 import { useMemo, useState } from "react";
 import { categories, recipes, type CategoryId } from "@/data/recipes";
+import { formatTime } from "@/lib/format";
 
 export const Route = createFileRoute("/")({
   head: () => ({
