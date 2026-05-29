@@ -30,8 +30,8 @@ function formatAmount(n: number) {
 }
 
 function RecipePage() {
-  const { recipe } = Route.useLoaderData();
-  const [servings, setServings] = useState(recipe.baseServings);
+  const { recipe } = Route.useLoaderData() as { recipe: ReturnType<typeof getRecipe> & object };
+  const [servings, setServings] = useState<number>(recipe.baseServings);
   const ratio = servings / recipe.baseServings;
 
   return (
