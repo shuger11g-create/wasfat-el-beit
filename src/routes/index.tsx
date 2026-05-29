@@ -109,7 +109,7 @@ function HomePage() {
                   <h3 className="font-bold text-foreground text-sm leading-tight mb-1">{r.name}</h3>
                   <div className="flex items-center gap-1 text-xs text-muted-foreground">
                     <Clock className="h-3.5 w-3.5" />
-                    <span>{r.time}</span>
+                    <span>{formatTime(r.timeMinutes)}</span>
                   </div>
                 </div>
               </Link>
