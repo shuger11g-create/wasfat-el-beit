@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowRight, Clock, Users, Minus, Plus, Lock } from "lucide-react";
 import { useState } from "react";
 import { getRecipe, type Recipe } from "@/data/recipes";
+import { formatAmount, formatTime } from "@/lib/format";
 
 export const Route = createFileRoute("/recipe/$id")({
   loader: ({ params }) => {
@@ -23,11 +24,6 @@ export const Route = createFileRoute("/recipe/$id")({
   ),
   component: RecipePage,
 });
-
-function formatAmount(n: number) {
-  if (Number.isInteger(n)) return String(n);
-  return n.toFixed(2).replace(/\.?0+$/, "");
-}
 
 function RecipePage() {
   const { recipe } = Route.useLoaderData() as { recipe: Recipe };
@@ -75,7 +71,7 @@ function RecipePage() {
           <div className="flex items-center gap-4 text-sm">
             <div className="flex items-center gap-1.5 text-foreground">
               <Clock className="h-4 w-4 text-primary" />
-              <span>{recipe.time}</span>
+              <span>{formatTime(recipe.timeMinutes)}</span>
             </div>
             <div className="flex items-center gap-1.5 text-foreground">
               <Users className="h-4 w-4 text-primary" />
