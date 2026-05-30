@@ -13,21 +13,29 @@ workflows:
       - name: Build web app
         script: |
           npm run build
-          # TanStack Start (nitro) emits the static client bundle under .output/public
-          # Capacitor expects a single static webDir, so we mirror it into ./dist
-          rm -rf dist
-          mkdir -p dist
-          if [ -d ".output/public" ]; then
-            cp -R .output/public/. dist/
-          elif [ -d "dist/client" ]; then
-            cp -R dist/client/. dist/
-          fi
-          # Ensure an index.html exists so Capacitor has an entry point
-          if [ ! -f "dist/index.html" ]; then
-            echo "ERROR: dist/index.html not found after build. Check vite/tanstack prerender output." >&2
-            ls -la dist || true
+          # TanStack Start emits SSR output (no static index.html).
+          # We start the preview server and capture the rendered HTML
+          # for "/" into dist/client/index.html so Capacitor has a static
+          # entry point. Client-side routing handles the rest in-app.
+          npx vite preview --port 4173 --host 127.0.0.1 --strictPort &
+          PREVIEW_PID=$!
+          # Wait for the server to be ready
+          for i in $(seq 1 30); do
+            if curl -sf http://127.0.0.1:4173/ > /dev/null; then
+              echo "Preview server is up"
+              break
+            fi
+            sleep 1
+          done
+          curl -sf http://127.0.0.1:4173/ -o dist/client/index.html
+          kill $PREVIEW_PID || true
+          if [ ! -s "dist/client/index.html" ]; then
+            echo "ERROR: failed to prerender dist/client/index.html" >&2
+            ls -la dist/client || true
             exit 1
           fi
+          echo "Prerendered index.html (first 40 lines):"
+          head -40 dist/client/index.html || true
       - name: Add Android platform
         script: |
           if [ ! -d "android" ]; then
