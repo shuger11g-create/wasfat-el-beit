@@ -42,13 +42,10 @@ export interface Recipe {
   secret?: boolean;
 }
 
-const categoryImage: Record<CategoryId, string> = {
-  drinks: colaImg,
-  desserts: vanillaImg,
-  mains: burgerImg,
-  pastries: manakishImg,
-  secret: colaImg,
-};
+// Featured recipes use locally-bundled hero images; generated recipes
+// derive their image from imageForRecipe() based on the recipe name.
+void manakishImg; // kept for potential future use
+
 
 // ============ Featured / hand-crafted recipes ============
 
