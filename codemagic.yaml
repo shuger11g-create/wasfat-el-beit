@@ -10,32 +10,20 @@ workflows:
       - name: Install dependencies
         script: |
           npm install --legacy-peer-deps
-      - name: Build web app
+      - name: Build web app (with prerender)
         script: |
+          # TanStack Start's prerender produces dist/client/index.html and
+          # static HTML for every crawlable route, which Capacitor bundles
+          # into the APK as the offline web assets.
           npm run build
-          # TanStack Start emits SSR output (no static index.html).
-          # We start the preview server and capture the rendered HTML
-          # for "/" into dist/client/index.html so Capacitor has a static
-          # entry point. Client-side routing handles the rest in-app.
-          npx vite preview --port 4173 --host 127.0.0.1 --strictPort &
-          PREVIEW_PID=$!
-          # Wait for the server to be ready
-          for i in $(seq 1 30); do
-            if curl -sf http://127.0.0.1:4173/ > /dev/null; then
-              echo "Preview server is up"
-              break
-            fi
-            sleep 1
-          done
-          curl -sf http://127.0.0.1:4173/ -o dist/client/index.html
-          kill $PREVIEW_PID || true
-          if [ ! -s "dist/client/index.html" ]; then
-            echo "ERROR: failed to prerender dist/client/index.html" >&2
-            ls -la dist/client || true
+          if [ ! -f "dist/client/index.html" ]; then
+            echo "ERROR: dist/client/index.html not found after build." >&2
+            echo "Listing dist/:" >&2
+            find dist -maxdepth 3 -type f 2>/dev/null | head -50 >&2
             exit 1
           fi
-          echo "Prerendered index.html (first 40 lines):"
-          head -40 dist/client/index.html || true
+          echo "Prerendered files:"
+          find dist/client -maxdepth 2 -name "*.html" | head -20
       - name: Add Android platform
         script: |
           if [ ! -d "android" ]; then
