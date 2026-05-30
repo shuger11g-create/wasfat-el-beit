@@ -4,6 +4,7 @@ import burgerImg from "@/assets/burger.jpg";
 import kunafaImg from "@/assets/kunafa.jpg";
 import snacksImg from "@/assets/snacks.jpg";
 import manakishImg from "@/assets/manakish.jpg";
+import { imageForRecipe } from "@/lib/recipe-image";
 
 export type CategoryId = "drinks" | "desserts" | "mains" | "pastries" | "secret";
 
@@ -41,13 +42,10 @@ export interface Recipe {
   secret?: boolean;
 }
 
-const categoryImage: Record<CategoryId, string> = {
-  drinks: colaImg,
-  desserts: vanillaImg,
-  mains: burgerImg,
-  pastries: manakishImg,
-  secret: colaImg,
-};
+// Featured recipes use locally-bundled hero images; generated recipes
+// derive their image from imageForRecipe() based on the recipe name.
+
+
 
 // ============ Featured / hand-crafted recipes ============
 
@@ -453,7 +451,6 @@ function generateForCategory(cat: CategoryId, count: number): Recipe[] {
   const { bases, flavors } = nameSets[cat];
   const pool = ingredientPools[cat];
   const steps = stepsByCategory[cat];
-  const img = categoryImage[cat];
   const out: Recipe[] = [];
   let n = 0;
   for (const base of bases) {
@@ -461,24 +458,20 @@ function generateForCategory(cat: CategoryId, count: number): Recipe[] {
       if (n >= count) break;
       n++;
       const name = `${base} ${flavor}`;
-      // Vary time: 15..150 min
       const timeMinutes = 15 + ((n * 7) % 136);
-      // Vary servings: 2,4,6,8
       const baseServings = [2, 4, 6, 8][n % 4];
-      // Slight amount variation per recipe
       const variation = 0.75 + ((n % 5) * 0.1);
       const ingredients: Ingredient[] = pool.map((ing) => ({
         ...ing,
         amount: Math.round(ing.amount * variation * 100) / 100,
       }));
-      // Add a flavor-specific accent ingredient
       ingredients.push({ name: `نكهة ${flavor.replace(/^ال/, "")}`, amount: 1, unit: "ملعقة كبيرة" });
 
       out.push({
         id: `${cat}-${n}`,
         name,
         category: cat,
-        image: img,
+        image: imageForRecipe(name, cat),
         timeMinutes,
         baseServings,
         description: `${name} — وصفة شهية وسهلة بمكونات متوفرة في كل بيت.`,
