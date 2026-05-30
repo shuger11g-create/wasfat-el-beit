@@ -1,0 +1,51 @@
+workflows:
+  android-apk:
+    name: Build Android APK (Capacitor)
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    environment:
+      node: 20
+      java: 21
+    scripts:
+      - name: Install dependencies
+        script: |
+          npm install --legacy-peer-deps
+      - name: Build web app
+        script: |
+          npm run build
+          # TanStack Start (nitro) emits the static client bundle under .output/public
+          # Capacitor expects a single static webDir, so we mirror it into ./dist
+          rm -rf dist
+          mkdir -p dist
+          if [ -d ".output/public" ]; then
+            cp -R .output/public/. dist/
+          elif [ -d "dist/client" ]; then
+            cp -R dist/client/. dist/
+          fi
+          # Ensure an index.html exists so Capacitor has an entry point
+          if [ ! -f "dist/index.html" ]; then
+            echo "ERROR: dist/index.html not found after build. Check vite/tanstack prerender output." >&2
+            ls -la dist || true
+            exit 1
+          fi
+      - name: Add Android platform
+        script: |
+          if [ ! -d "android" ]; then
+            npx cap add android
+          fi
+          npx cap sync android
+      - name: Build debug APK
+        script: |
+          cd android
+          chmod +x ./gradlew
+          ./gradlew assembleDebug
+    artifacts:
+      - android/app/build/outputs/**/*.apk
+      - android/app/build/outputs/**/mapping.txt
+    publishing:
+      email:
+        recipients:
+          - your-email@example.com
+        notify:
+          success: true
+          failure: true
