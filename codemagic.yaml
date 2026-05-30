@@ -10,24 +10,20 @@ workflows:
       - name: Install dependencies
         script: |
           npm install --legacy-peer-deps
-      - name: Build web app
+      - name: Build web app (with prerender)
         script: |
+          # TanStack Start's prerender produces dist/client/index.html and
+          # static HTML for every crawlable route, which Capacitor bundles
+          # into the APK as the offline web assets.
           npm run build
-          # TanStack Start (nitro) emits the static client bundle under .output/public
-          # Capacitor expects a single static webDir, so we mirror it into ./dist
-          rm -rf dist
-          mkdir -p dist
-          if [ -d ".output/public" ]; then
-            cp -R .output/public/. dist/
-          elif [ -d "dist/client" ]; then
-            cp -R dist/client/. dist/
-          fi
-          # Ensure an index.html exists so Capacitor has an entry point
-          if [ ! -f "dist/index.html" ]; then
-            echo "ERROR: dist/index.html not found after build. Check vite/tanstack prerender output." >&2
-            ls -la dist || true
+          if [ ! -f "dist/client/index.html" ]; then
+            echo "ERROR: dist/client/index.html not found after build." >&2
+            echo "Listing dist/:" >&2
+            find dist -maxdepth 3 -type f 2>/dev/null | head -50 >&2
             exit 1
           fi
+          echo "Prerendered files:"
+          find dist/client -maxdepth 2 -name "*.html" | head -20
       - name: Add Android platform
         script: |
           if [ ! -d "android" ]; then
