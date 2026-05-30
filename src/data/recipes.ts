@@ -44,7 +44,7 @@ export interface Recipe {
 
 // Featured recipes use locally-bundled hero images; generated recipes
 // derive their image from imageForRecipe() based on the recipe name.
-void manakishImg; // kept for potential future use
+
 
 
 // ============ Featured / hand-crafted recipes ============
