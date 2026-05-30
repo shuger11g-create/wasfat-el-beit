@@ -4,6 +4,7 @@ import burgerImg from "@/assets/burger.jpg";
 import kunafaImg from "@/assets/kunafa.jpg";
 import snacksImg from "@/assets/snacks.jpg";
 import manakishImg from "@/assets/manakish.jpg";
+import { imageForRecipe } from "@/lib/recipe-image";
 
 export type CategoryId = "drinks" | "desserts" | "mains" | "pastries" | "secret";
 
